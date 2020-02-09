@@ -2,7 +2,7 @@
 // @name        ii-puzzle-solver
 // @namespace   http://idioticdev.com
 // @description Solves for puzzle combat.
-// @require     https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js
+// @require     https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js
 // @include     http://*improbableisland.com/*op=search*
 // @include     https://*improbableisland.com/*op=search*
 // @include     http://*improbableisland.com/*op=fight*
