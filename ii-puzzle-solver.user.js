@@ -1,4 +1,4 @@
-﻿// ==UserScript==
+// ==UserScript==
 // @name        ii-puzzle-solver
 // @namespace   http://idioticdev.com
 // @description Solves for puzzle combat.
@@ -13,15 +13,17 @@
 // @include     https://*improbableisland.com/badnav.php*
 // @include     http://*improbableisland.com/runmodule.php?module=onslaught*
 // @include     https://*improbableisland.com/runmodule.php?module=onslaught*
-// @version     4.0
+// @version     4.1
 // @grant       GM_setValue
 // @grant       GM_getValue
 // @grant       GM_xmlhttpRequest
 // ==/UserScript==
 
+// eslint-disable-next-line camelcase
+// let $, GM_setValue, GM_getValue, GM_xmlhttpRequest
+
 let state = ''
 let broken = ''
-let zero = ''
 const inputs = []
 const details = $('<table/>')
 
@@ -88,7 +90,6 @@ function setup () {
         broken += '0'
     }
 
-    zero += '0'
     inputs.push($('<input/>')
       .css({
         margin: '5px 0 0 8px',
@@ -128,7 +129,20 @@ function setup () {
 
 function findMonster () {
   log('ii-puzzle-solver findMonster() start')
-  let monster = $('span.colLtYellow')[0].textContent
+  const possibleMonsters = $('span.colLtYellow')
+  let monster
+
+  for (const choice of possibleMonsters) {
+    if (choice.nextElementSibling && choice.nextElementSibling.textContent.trim() === 'which lunges at you with') { monster = choice.textContent }
+  }
+
+  const tiers = ['Elite', 'Deadly', 'Lethal', 'Savage', 'Malignant', 'Dangerous', 'Malevolent']
+  for (const tier of tiers) {
+    if (monster.startsWith(tier)) {
+      monster = monster.slice(tier.length + 1)
+      break
+    }
+  }
 
   // Is this theme-dependant?
   const count = $('td.content > span > span.colLtRed').length - 1
@@ -164,11 +178,18 @@ function retrieveStun (name, level) {
   querySpreadsheet(name === 'Lion' ? `select L,M,N,O,P where A contains "Lion (${level})" and B=${level}` : `select L,M,N,O,P where A="${name}"`,
     response => {
       log(response.responseText.slice(response.responseText.indexOf('(') + 1, response.responseText.length - 2))
-      const sequence = JSON.parse(response.responseText.slice(response.responseText.indexOf('(') + 1, response.responseText.length - 2)).table.rows[0].c
-      $('<tr/>').append(
-        $('<td/>').text('Stun Sequence'),
-        $('<td/>').text(sequence.map(c => c.v))
-      ).appendTo(details)
+      const parsed = JSON.parse(response.responseText.slice(response.responseText.indexOf('(') + 1, response.responseText.length - 2))
+      try {
+        const sequence = parsed.table.rows[0].c
+        $('<tr/>').append(
+          $('<td/>').text('Stun Sequence'),
+          $('<td/>').text(sequence.map(c => c.v))
+        ).appendTo(details)
+      } catch (e) {
+        console.error(e)
+        log(parsed)
+        log(response)
+      }
     })
   log('ii-puzzle-solver retrieveStun end')
 }
@@ -220,12 +241,7 @@ XOR X with any set of the numbers, in any order, as often as you want, so that X
 // array: list of toggles of each limb
 // test: current monster state
 // filter: broken limbs
-
 function solve (array, test, filter) {
-  // [225,77,161,180,90,46,110,37],
-  // 45,
-  // 0
-
   log(`ii-puzzle-solver solve([${array}], 0b${test.toString(2)}, 0b${filter.toString(2)}) start`)
 
   const result = []
