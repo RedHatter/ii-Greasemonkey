@@ -20,7 +20,7 @@ const keys = {
   "eBoy's Trading Station": 'e',
   "Sheila's Shack O' Shiny": 's',
   'Bank of Improbable': 'b',
-  'Quit to the fields': 'Q',
+  'Quit to the fields': 'Q',
   'New Day Menu': '*',
   "The Hunter's Lodge": 'l',
   'Location Four': '4',
@@ -117,11 +117,10 @@ const alpha = [
 
 let links = {}
 
-document.addEventListener('keypress', (e) => {
+document.addEventListener('keydown', (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey || document.querySelector('input:focus') !== null) return
 
-  let key = String.fromCharCode(e.charCode)
-  let link = document.querySelector(`[accesskey='${key}']`)
+  let link = document.querySelector(`[accesskey='${e.key}']`)
   if (link === null) return
 
   link.click()
