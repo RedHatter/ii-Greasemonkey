@@ -7,8 +7,7 @@
 // @exclude     http://*improbableisland.com/home.php*
 // @exclude     https://*improbableisland.com/home.php*
 // @version     2.2
-// @require     https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js
-// @require     https://gist.github.com/raw/2625891/waitForKeyElements.js
+// @require     https://cdn.jsdelivr.net/gh/CoeJoder/waitForKeyElements.js@v1.2/waitForKeyElements.js
 // @run-at      document-start
 // ==/UserScript==
 const keys = {
@@ -128,12 +127,7 @@ document.addEventListener('keypress', (e) => {
   link.click()
 })
 
-let processed = []
-waitForKeyElements('a.nav', (node) => {
-  if (processed.includes(node[0])) return
-  processed.push(node[0])
-  assign(node[0])
-})
+waitForKeyElements('a.nav', assign, true, 100)
 
 function assign(node) {
   const oldKey = node.getAttribute('accesskey')
