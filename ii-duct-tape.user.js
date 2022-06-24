@@ -7,7 +7,7 @@
 // @exclude     http://*improbableisland.com/home.php*
 // @exclude     https://*improbableisland.com/home.php*
 // @version     2.2
-// @require     https://cdn.jsdelivr.net/gh/CoeJoder/waitForKeyElements.js@v1.2/waitForKeyElements.js
+// @require     https://cdn.jsdelivr.net/gh/CoeJoder/GM_wrench@v1.3/dist/GM_wrench.min.js
 // @run-at      document-start
 // ==/UserScript==
 const keys = {
@@ -117,16 +117,30 @@ const alpha = [
 
 let links = {}
 
+GM_wrench.waitForKeyElements('a.nav', assign, true, 100)
+GM_wrench.waitForKeyElements('head', (head) =>
+  GM_wrench.addCss(`
+  .flash {
+    animation: flash linear 0.3s;
+  }
+
+  @keyframes flash {
+    0% { opacity: 1; } 
+    50% { opacity: 0.1; } 
+    100% { opacity: 1; }
+  }
+  `),
+)
+
 document.addEventListener('keydown', (e) => {
   if (e.altKey || e.ctrlKey || e.metaKey || document.querySelector('input:focus') !== null) return
 
   let link = document.querySelector(`[accesskey='${e.key}']`)
   if (link === null) return
 
+  link.classList.add('flash')
   link.click()
 })
-
-waitForKeyElements('a.nav', assign, true, 100)
 
 function assign(node) {
   const oldKey = node.getAttribute('accesskey')
